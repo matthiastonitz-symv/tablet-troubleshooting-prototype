@@ -4,7 +4,7 @@ Ein statischer HTML-Prototyp für eine neue App-Ansicht, die Techniker:innen Sch
 
 ## Dateien
 - `index.html` – Prototyp der Ansicht inkl. Modal/Popup für Screenshot-Versand.
-- `schritte/steps.md` – Original-Textbausteine für die Schritte.
+- `referenz/anleitung.md` – Original-Textbausteine für die Schritte.
 
 ## Starten
 Öffnen Sie die Datei `index.html` im Browser (Doppelklick oder per lokalem Webserver).
