@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>waterloo – Tablet Hilfe (Prototype)</title>
+    <style>
+      :root {
+        --bg: #0f1b40;
+        --bg-2: #1b3b8a;
+        --primary: #3b82f6;
+        --primary-600: #2563eb;
+        --accent: #22d3ee;
+        --text: #e6eeff;
+        --muted: #a8b0c6;
+        --card: #172554;
+        --card-2: #0b1535;
+        --ok: #22c55e;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+        --radius: 14px;
+      }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        background: #475BB4;
+      }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 18px 80px; }
+      header {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; }
+      .logo { display: inline-block; }
+      .logo img { height: 36px; width: auto; display: block; filter: drop-shadow(0 6px 16px rgba(0,0,0,.35)); }
+      h1 { font-size: 22px; margin: 0; letter-spacing: .3px; font-weight: 700; }
+      .status { display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; }
+      .chip { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; min-width: 160px; }
+      .chip span { font-size: 12px; color: var(--muted); }
+      .chip input { all: unset; color: var(--text); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+      .page-card {
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        border: 1px solid rgba(255,255,255,.09);
+        border-radius: var(--radius);
+        padding: 22px; box-shadow: var(--shadow);
+      }
+      .lead { color: rgba(255,255,255,.95); margin: 6px 0 14px; font-weight: 500; }
+      ol.steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  .step { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; background: linear-gradient(180deg, rgba(15,27,64,.6), rgba(15,27,64,.3)); border: 1px solid rgba(255,255,255,.08); padding: 14px; border-radius: 12px; }
+  .step .num { width: 52px; height: 52px; display: grid; place-items: center; background: linear-gradient(160deg, var(--primary-600), var(--primary)); border-radius: 12px; font-weight: 900; font-size: 18px; box-shadow: 0 8px 20px rgba(37, 99, 235, .35); color: #fff; }
+  .step p { margin: 4px 0; line-height: 1.55; }
+  .step .step-title { display: inline-block; font-weight: 900; color: #a7f3d0; letter-spacing: .2px; margin-right: 6px; }
+  .phones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; max-width: 500px; }
+  .phone { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 6px 14px; border-radius: 12px; font-weight: 700; box-shadow: none; font-size: 13px; line-height: 1.3; background: rgba(255,255,255,.06) !important; color: var(--text) !important; border: 1px solid rgba(255,255,255,.12); cursor: pointer; transition: background .2s ease; }
+  .phone:hover { background: rgba(255,255,255,.10) !important; }
+  .phone:active { transform: scale(0.98); }
+  .phone .meta { font-weight: 600; opacity: .9; font-size: 11px; color: var(--muted); }
+  .phone .phone-num { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 15px; font-weight: 800; color: var(--text); }
+  @media (max-width: 520px) { .phones { grid-template-columns: 1fr; } }
+      a.inline { color: #a7f3d0; text-decoration: underline; text-decoration-color: rgba(167,243,208,.35); text-underline-offset: 2px; cursor: pointer; }
+      .toolbar { display: flex; gap: 10px; margin-top: 16px; }
+      button.btn { appearance: none; border: none; background: linear-gradient(160deg, var(--primary-600), var(--primary)); color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 700; box-shadow: 0 10px 18px rgba(37,99,235,.28); cursor: pointer; }
+      button.btn.secondary { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: var(--text); box-shadow: none; }
+
+      /* Modal */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,.6); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 50; }
+  .modal { width: min(920px, 100%); background: #ffffff; color: #0b1225; border: 1px solid rgba(0,0,0,.08); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .modal header { padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid rgba(0,0,0,.08); color: #0b1225; }
+  .modal header h2 { margin: 0; font-size: 18px; }
+  .modal .content { padding: 16px 18px 20px; display: grid; gap: 14px; }
+      .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+      .col-6 { grid-column: span 6; }
+      .col-12 { grid-column: span 12; }
+      @media (max-width: 720px) { 
+        .col-6 { grid-column: span 12; } 
+        header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .status { width: 100%; }
+      }
+  label { display: block; font-size: 12px; color: #475569; margin-bottom: 6px; }
+  select, textarea, input[type="text"], input[type="tel"] { width: 100%; background: #ffffff; color: #0b1225; border: 1px solid rgba(0,0,0,.2); border-radius: 10px; padding: 10px 12px; outline: none; }
+      textarea { min-height: 96px; resize: vertical; }
+      input[type="file"] { width: 100%; color: var(--muted); }
+      .previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .preview { position: relative; background: #f1f5f9; border: 1px solid rgba(0,0,0,.08); border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; display: grid; place-items: center; color: #475569; font-size: 12px; }
+      .preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .modal footer { display: flex; gap: 10px; justify-content: flex-end; padding: 12px 18px 16px; background: #f8fafc; border-top: 1px solid rgba(0,0,0,.08); }
+  .close-x { background: transparent; border: none; color: #64748b; font-size: 22px; cursor: pointer; }
+
+      /* Toast */
+      .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px); background: #0b1535; color: #d1fae5; border: 1px solid rgba(34,197,94,.5); box-shadow: var(--shadow); padding: 10px 14px; border-radius: 12px; opacity: 0; transition: all .25s ease; z-index: 60; }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+      /* QR Code Modal */
+      .qr-modal { position: fixed; inset: 0; background: rgba(2,6,23,.8); display: none; align-items: center; justify-content: center; z-index: 70; }
+      .qr-modal.show { display: flex; }
+      .qr-content { background: #ffffff; padding: 24px; border-radius: 16px; text-align: center; max-width: 400px; }
+      .qr-content h3 { margin: 0 0 16px; color: #0b1225; font-size: 18px; }
+      .qr-content img { width: 280px; height: 280px; border: 4px solid #f1f5f9; border-radius: 12px; }
+      .qr-content p { margin: 12px 0 0; color: #475569; font-size: 14px; }
+      .qr-close { margin-top: 16px; padding: 10px 20px; background: #475BB4; color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <div class="logo"><img src="assets/waterloo_logo.png" alt="waterloo" /></div>
+          <h1>Tablet Hilfe</h1>
+        </div>
+        <div class="status">
+          <div class="chip">
+            <span>Angemeldet als</span>
+            <input id="userName" type="text" value="Techniker/in" aria-label="Angemeldet als" />
+          </div>
+          <div class="chip">
+            <span>Tablet IMEI</span>
+            <input id="tabletImei" type="tel" value="359881234567890" aria-label="Tablet IMEI" />
+          </div>
+        </div>
+      </header>
+
+      <section class="page-card">
+        <p class="lead">Mit dieser Anleitung können Sie die häufigsten Probleme mit unseren Tablets beheben. </p>
+
+        <ol class="steps">
+          <li class="step">
+            <div class="num">1</div>
+            <div>
+              <p><span class="step-title">1. Schritt</span> – Stellen Sie bitte sicher, dass das Tablet eine gute Internetverbindung hat (4G sollte in der Adressleiste stehen, oder per WLAN)</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="num">2</div>
+            <div>
+              <p><span class="step-title">2. Schritt</span> – Bitte gehen Sie in die <em>Einstellungen (Link)</em> des Tablets, dann zu Konfigurationsdienst, SYMVARO GmbH, Aktualisieren. Nachdem die Aktualisierung fertig ist, starten Sie das Tablet bitte neu und kontrollieren Sie, ob der Fehler behoben wurde. Falls nicht, bitte gehen Sie zu Schritt 2.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="num">3</div>
+            <div>
+              <p><span class="step-title">3. Schritt</span> – Falls der Fehler weiter besteht, melden Sie sich bitte ab und wieder neu ein. Den PIN, falls vergessen, können Sie oder die zuständigen Kollegen über my.waterloo.io ändern.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="num">4</div>
+            <div>
+              <p>
+                <span class="step-title">4. Schritt</span> – Falls der Fehler weiter besteht, fertigen Sie bitte Screenshots (Screenshots können Sie über Lauter-Taste + Einschalttaste anfertigen) von dem Teil unserer App an, und senden Sie diese bitte an unser Team über dieses Formular.
+              </p>
+              <div class="toolbar">
+                <button class="btn" id="openModalBtn" type="button">Screenshot-Formular öffnen</button>
+                <button class="btn secondary" type="button" id="helpExamples">So fertigen Sie Screenshots an</button>
+              </div>
+              <div class="phones" aria-label="Support Telefonnummern">
+                <div class="phone" id="phoneAT" data-qr="at-nr">
+                  <span class="meta">Telefonsupport (Österreich)</span>
+                  <span class="phone-num">+43 463 90 91 90</span>
+                </div>
+                <div class="phone" id="phoneDE" data-qr="de-nr">
+                  <span class="meta">Telefonsupport (Deutschland)</span>
+                  <span class="phone-num">+49 861 869 9400</span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="backdrop" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header>
+          <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:space-between;">
+            <h2 id="modalTitle">Screenshots senden</h2>
+            <button class="close-x" id="closeModal" aria-label="Schließen">×</button>
+          </div>
+        </header>
+  <form id="reportForm">
+          <div class="content">
+            <div class="grid">
+              <div class="col-6">
+                <label>Angemeldet als</label>
+                <input type="text" id="mfUser" readonly />
+              </div>
+              <div class="col-6">
+                <label>Tablet IMEI</label>
+                <input type="text" id="mfImei" readonly />
+              </div>
+
+              <div class="col-6">
+                <label for="appArea">Bereich der App (Auswahlfeld)</label>
+                <select id="appArea" required>
+                  <option value="" disabled selected>Bitte wählen…</option>
+                  <option>Dashboard</option>
+                  <option>Tausch</option>
+                  <option>Ablesung</option>
+                  <option>AirRead</option>
+                  <option>Termine</option>
+                  <option>Einbau</option>
+                  <option>Ausbau</option>
+                  <option>Einstellungen</option>
+                  <option>Anderes</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="priority">Dringlichkeit (Auswahlfeld)</label>
+                <select id="priority" required>
+                  <option value="" disabled selected>Bitte wählen…</option>
+                  <option>Niedrig</option>
+                  <option>Normal</option>
+                  <option>Hoch</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label for="description">Beschreibung (Freitext)</label>
+                <textarea id="description" placeholder="Beschreiben Sie kurz das Problem…"></textarea>
+              </div>
+
+              <div class="col-12">
+                <label for="images">Screenshots hinzufügen (Mock Bildauswahl)</label>
+                <input id="images" type="file" accept="image/*" multiple />
+                <div class="previews" id="previews" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+          <footer>
+            <button class="btn secondary" type="button" id="cancelBtn">Abbrechen</button>
+            <button class="btn" type="submit">Senden</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Danke! Ihre Angaben wurden protokolliert (Konsole).</div>
+
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+      <div class="qr-content">
+        <h3 id="qrTitle">QR-Code scannen</h3>
+        <img id="qrImage" src="" alt="QR Code" />
+        <p id="qrNumber"></p>
+        <button class="qr-close" id="qrClose">Schließen</button>
+      </div>
+    </div>
+
+    <script>
+      const $ = (s, r=document) => r.querySelector(s);
+      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+      const backdrop = $('#backdrop');
+  // Removed inline link trigger; dedicated button remains
+      const openModalBtn = $('#openModalBtn');
+      const closeModal = $('#closeModal');
+      const cancelBtn = $('#cancelBtn');
+      const reportForm = $('#reportForm');
+      const imagesInput = $('#images');
+      const previews = $('#previews');
+      const toast = $('#toast');
+      const userName = $('#userName');
+      const tabletImei = $('#tabletImei');
+      const mfUser = $('#mfUser');
+      const mfImei = $('#mfImei');
+
+      // QR Code modal elements
+      const qrModal = $('#qrModal');
+      const qrImage = $('#qrImage');
+      const qrTitle = $('#qrTitle');
+      const qrNumber = $('#qrNumber');
+      const qrClose = $('#qrClose');
+      const phoneAT = $('#phoneAT');
+      const phoneDE = $('#phoneDE');
+
+      // QR code data
+      const qrData = {
+        'at-nr': {
+          title: 'Telefonsupport Österreich',
+          number: '+43 463 90 91 90',
+          image: 'assets/qr-code-at-nr.png'
+        },
+        'de-nr': {
+          title: 'Telefonsupport Deutschland',
+          number: '+49 861 869 9400',
+          image: 'assets/qr-code-de-nr.png'
+        }
+      };
+
+      function showQRCode(qrKey) {
+        const data = qrData[qrKey];
+        if (data) {
+          qrTitle.textContent = data.title;
+          qrNumber.textContent = data.number;
+          qrImage.src = data.image;
+          qrModal.classList.add('show');
+        }
+      }
+
+      function hideQRCode() {
+        qrModal.classList.remove('show');
+      }
+
+      // Touch/click events for phone boxes
+      phoneAT.addEventListener('click', () => showQRCode('at-nr'));
+      phoneDE.addEventListener('click', () => showQRCode('de-nr'));
+      qrClose.addEventListener('click', hideQRCode);
+      qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) hideQRCode();
+      });
+
+      function openModal() {
+        mfUser.value = userName.value || '';
+        mfImei.value = tabletImei.value || '';
+        backdrop.style.display = 'flex';
+        backdrop.setAttribute('aria-hidden', 'false');
+        setTimeout(() => $('#appArea').focus(), 0);
+      }
+      function hideModal() {
+        backdrop.style.display = 'none';
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
+      openModalBtn.addEventListener('click', openModal);
+      closeModal.addEventListener('click', hideModal);
+      cancelBtn.addEventListener('click', hideModal);
+      backdrop.addEventListener('click', (e) => { if (e.target === backdrop) hideModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideModal(); });
+
+      imagesInput.addEventListener('change', () => {
+        previews.innerHTML = '';
+        const files = Array.from(imagesInput.files || []);
+        if (!files.length) {
+          const stub = document.createElement('div');
+          stub.className = 'preview';
+          stub.textContent = 'Keine Bilder ausgewählt';
+          previews.appendChild(stub);
+          return;
+        }
+        files.forEach(file => {
+          const card = document.createElement('div');
+          card.className = 'preview';
+          if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.alt = file.name;
+            card.appendChild(img);
+            const reader = new FileReader();
+            reader.onload = e => img.src = e.target.result;
+            reader.readAsDataURL(file);
+          } else {
+            card.textContent = file.name;
+          }
+          previews.appendChild(card);
+        });
+      });
+
+      reportForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = {
+          userName: userName.value,
+          tabletImei: tabletImei.value,
+          appArea: $('#appArea').value,
+          priority: $('#priority').value,
+          description: $('#description').value,
+          imageNames: Array.from(imagesInput.files || []).map(f => f.name)
+        };
+        console.group('%cScreenshot-Formular','color:#22d3ee');
+        console.log('Benutzer', formData.userName);
+        console.log('Tablet IMEI', formData.tabletImei);
+        console.log('Bereich', formData.appArea);
+        console.log('Dringlichkeit', formData.priority);
+        console.log('Beschreibung', formData.description);
+        console.log('Bilder', formData.imageNames);
+        console.groupEnd();
+
+        showToast();
+        reportForm.reset();
+        previews.innerHTML = '';
+        hideModal();
+      });
+
+      function showToast() {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      // Demo helper for the secondary button
+      $('#helpExamples').addEventListener('click', () => {
+        alert('Tipp: Halten Sie die Lauter-Taste und die Einschalttaste gleichzeitig gedrückt, um einen Screenshot zu erstellen.');
+      });
+
+      // Initialize previews with an empty state
+      imagesInput.dispatchEvent(new Event('change'));
+    </script>
+  </body>
+</html>
